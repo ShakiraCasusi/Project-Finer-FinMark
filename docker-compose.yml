@@ -1,26 +1,57 @@
 version: '3.8'
+
 services:
+  # Auth Service Database
+  auth-db:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_DB: auth_db
+      POSTGRES_USER: auth_user
+      POSTGRES_PASSWORD: auth_pass
+    volumes:
+      - auth-data:/var/lib/postgresql/data
+
+  # Auth Service App
   auth-service:
     build: ./services/auth-service
     ports:
       - "3001:3001"
-    environment:
-      - AUTH_PORT=3001
-      - AUTH_DB_URL=postgresql://auth_user:password@auth-db:5432/auth_db
-      - JWT_SECRET=your_jwt_secret
     depends_on:
       - auth-db
-
-  auth-db:
-    image: postgres:14
     environment:
-      POSTGRES_USER: auth_user
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: auth_db
-    ports:
-      - "5432:5432"
+      - DB_HOST=auth-db
+      - DB_PORT=5432
+      - DB_NAME=auth_db
+      - DB_USER=auth_user
+      - DB_PASS=auth_pass
+      - JWT_SECRET=supersecretkey
+
+  # User Service Database
+  user-db:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_DB: user_db
+      POSTGRES_USER: user_user
+      POSTGRES_PASSWORD: user_pass
     volumes:
-      - auth-data:/var/lib/postgresql/data
+      - user-data:/var/lib/postgresql/data
+
+  # User Service App
+  user-service:
+    build: ./services/user-service
+    ports:
+      - "3002:3002"
+    depends_on:
+      - user-db
+    environment:
+      - DB_HOST=user-db
+      - DB_PORT=5432
+      - DB_NAME=user_db
+      - DB_USER=user_user
+      - DB_PASS=user_pass
 
 volumes:
   auth-data:
+  user-data:

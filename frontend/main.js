@@ -17,18 +17,15 @@ document.getElementById('login-form').addEventListener('submit', async (e) => {
     if (response.ok) {
       localStorage.setItem('token', data.token);
       resultDiv.textContent = '✅ Logged in successfully!';
-      resultDiv.classList.remove('error');
-
-      // Redirect after 1s
       setTimeout(() => {
         window.location.href = 'dashboard.html';
-      }, 1000);
+      }, 1200);
     } else {
       resultDiv.textContent = `❌ ${data.error}`;
-      resultDiv.classList.add('error');
+      resultDiv.style.color = 'red';
     }
   } catch (err) {
     resultDiv.textContent = '❌ Network error';
-    resultDiv.classList.add('error');
+    resultDiv.style.color = 'red';
   }
 });

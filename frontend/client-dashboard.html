@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Client Dashboard - FinMark</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .dashboard {
+      max-width: 600px;
+      margin: 4rem auto;
+      padding: 2rem;
+      background-color: #ffffff;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.05);
+      text-align: center;
+    }
+    .dashboard h2 {
+      color: #3c78d8;
+      margin-bottom: 0.5rem;
+    }
+    .dashboard .logout-btn {
+      background-color: #3c78d8;
+      color: #fff;
+      padding: 0.6rem 1.2rem;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="dashboard" id="dashboard">
+    <h2>Checking client access...</h2>
+    <p>Loading...</p>
+  </div>
+
+  <script>
+    const dashboard = document.getElementById('dashboard');
+    const token = localStorage.getItem('token');
+
+    if (!token) {
+      dashboard.innerHTML = "<h2>Unauthorized</h2><p>Please log in first.</p>";
+    } else {
+      try {
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        const { userId, role, exp } = payload;
+        const now = Math.floor(Date.now() / 1000);
+
+        if (exp < now) {
+          localStorage.removeItem('token');
+          dashboard.innerHTML = "<h2>Session Expired</h2><p>Please log in again.</p>";
+        } else if (role !== 'client') {
+          dashboard.innerHTML = "<h2>Access Denied</h2><p>This page is for client accounts only.</p>";
+        } else {
+          dashboard.innerHTML = `
+            <h2>Welcome, Client!</h2>
+            <p>Your user ID is ${userId}</p>
+            <button class="logout-btn" onclick="logout()">Logout</button>
+          `;
+        }
+      } catch (err) {
+        dashboard.innerHTML = "<h2>Error</h2><p>Invalid token format.</p>";
+      }
+    }
+
+    function logout() {
+      localStorage.removeItem('token');
+      window.location.href = 'index.html';
+    }
+  </script>
+</body>
+</html>
