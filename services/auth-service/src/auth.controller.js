@@ -3,11 +3,14 @@ const jwt = require('jsonwebtoken');
 const db = require('../config/db');
 
 const register = async (req, res) => {
-  const { email, password } = req.body;
+  const { email, password, phone } = req.body; // now accepts phone
   const hashed = await bcrypt.hash(password, 10);
 
   try {
-    await db.query('INSERT INTO users (email, password) VALUES ($1, $2)', [email, hashed]);
+    await db.query(
+      'INSERT INTO users (email, password, phone) VALUES ($1, $2, $3)',
+      [email, hashed, phone || null]
+    );
     res.status(201).json({ message: 'User registered successfully' });
   } catch (err) {
     res.status(500).json({ error: 'Registration failed', details: err.message });
@@ -32,4 +35,5 @@ const login = async (req, res) => {
 };
 
 module.exports = { register, login };
+
 
