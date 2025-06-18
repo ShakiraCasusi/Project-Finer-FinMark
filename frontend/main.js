@@ -15,14 +15,20 @@ document.getElementById('login-form').addEventListener('submit', async (e) => {
     const data = await response.json();
 
     if (response.ok) {
-      resultDiv.textContent = `Token: ${data.token}`;
+      localStorage.setItem('token', data.token);
+      resultDiv.textContent = '✅ Logged in successfully!';
       resultDiv.classList.remove('error');
+
+      // Redirect after 1s
+      setTimeout(() => {
+        window.location.href = 'dashboard.html';
+      }, 1000);
     } else {
-      resultDiv.textContent = `${data.error}`;
+      resultDiv.textContent = `❌ ${data.error}`;
       resultDiv.classList.add('error');
     }
   } catch (err) {
-    resultDiv.textContent = 'Network error';
+    resultDiv.textContent = '❌ Network error';
     resultDiv.classList.add('error');
   }
 });

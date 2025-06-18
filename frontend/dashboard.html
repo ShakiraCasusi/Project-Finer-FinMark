@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Dashboard</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      padding: 2rem;
+      background: #f0f0f0;
+    }
+    .card {
+      background: white;
+      padding: 2rem;
+      border-radius: 8px;
+      max-width: 600px;
+      margin: 2rem auto;
+      box-shadow: 0 0 8px rgba(0,0,0,0.1);
+    }
+    .error { color: red; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h2>Welcome to FinMark</h2>
+    <p id="info">Loading...</p>
+  </div>
+
+  <script>
+    const token = localStorage.getItem('token');
+    const info = document.getElementById('info');
+
+    if (!token) {
+      info.textContent = '❌ Not logged in.';
+    } else {
+      // Decode token manually
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      info.textContent = `✅ Logged in as User ID: ${payload.userId}, Role: ${payload.role}`;
+    }
+  </script>
+</body>
+</html>
