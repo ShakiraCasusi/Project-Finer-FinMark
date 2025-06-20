@@ -2,73 +2,61 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Client Dashboard - FinMark</title>
+  <title>Client Dashboard – FinMark</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <link rel="stylesheet" href="style.css">
   <style>
-    .dashboard {
-      max-width: 600px;
-      margin: 4rem auto;
-      padding: 2rem;
-      background-color: #ffffff;
-      border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.05);
-      text-align: center;
-    }
-    .dashboard h2 {
-      color: #3c78d8;
-      margin-bottom: 0.5rem;
-    }
-    .dashboard .logout-btn {
-      background-color: #3c78d8;
-      color: #fff;
-      padding: 0.6rem 1.2rem;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-    }
+    .dashboard{max-width:600px;margin:4rem auto;padding:2rem;background:#fff;border-radius:10px;
+               box-shadow:0 0 10px rgba(0,0,0,.05);text-align:center}
+    .dashboard h2{color:#3c78d8;margin-bottom:.5rem}
+    .logout-btn{background:#3c78d8;color:#fff;padding:.6rem 1.2rem;border:none;
+                border-radius:6px;cursor:pointer}
+    .logout-btn:hover{background:#3366b8}
   </style>
 </head>
 <body>
-
-  <div class="dashboard" id="dashboard">
-    <h2>Checking client access...</h2>
-    <p>Loading...</p>
+  <div id="dashboard" class="dashboard">
+    <h2>Loading profile…</h2><p>Please wait.</p>
   </div>
 
   <script>
-    const dashboard = document.getElementById('dashboard');
+    const dash = document.getElementById('dashboard');
     const token = localStorage.getItem('token');
 
-    if (!token) {
-      dashboard.innerHTML = "<h2>Unauthorized</h2><p>Please log in first.</p>";
+    if (!token){
+      dash.innerHTML='<h2>Unauthorized</h2><p>Please log in first.</p>';
     } else {
-      try {
-        const payload = JSON.parse(atob(token.split('.')[1]));
-        const { userId, role, exp } = payload;
-        const now = Math.floor(Date.now() / 1000);
-
-        if (exp < now) {
+      try{
+        const p = JSON.parse(atob(token.split('.')[1]));   // decode JWT payload
+        const {userId,role,exp}=p;
+        if(exp < Math.floor(Date.now()/1000)){
           localStorage.removeItem('token');
-          dashboard.innerHTML = "<h2>Session Expired</h2><p>Please log in again.</p>";
-        } else if (role !== 'client') {
-          dashboard.innerHTML = "<h2>Access Denied</h2><p>This page is for client accounts only.</p>";
+          dash.innerHTML='<h2>Session expired</h2><p>Please log in again.</p>';
+        } else if(role!=='client'){
+          dash.innerHTML='<h2>Access denied</h2><p>For client accounts only.</p>';
         } else {
-          dashboard.innerHTML = `
-            <h2>Welcome, Client!</h2>
-            <p>Your user ID is ${userId}</p>
-            <button class="logout-btn" onclick="logout()">Logout</button>
-          `;
+          // fetch real profile from user‑service
+          fetch(`http://localhost:3002/user/profile/${userId}`)
+            .then(r=>r.json())
+            .then(d=>{
+              if(d.error){
+                dash.innerHTML=`<h2>Error</h2><p>${d.error}</p>`;
+              } else {
+                dash.innerHTML = `
+                  <h2>Welcome, ${d.email}</h2>
+                  <p>User ID : ${d.id}</p>
+                  <p>Role    : ${d.role}</p>
+                  <button class="logout-btn" onclick="logout()">Logout</button>
+                `;
+              }
+            })
+            .catch(()=>dash.innerHTML='<h2>Network error</h2><p>Could not load profile.</p>');
         }
-      } catch (err) {
-        dashboard.innerHTML = "<h2>Error</h2><p>Invalid token format.</p>";
+      }catch(e){
+        dash.innerHTML='<h2>Error</h2><p>Invalid token.</p>';
       }
     }
-
-    function logout() {
-      localStorage.removeItem('token');
-      window.location.href = 'index.html';
-    }
+    function logout(){localStorage.removeItem('token');location.href='index.html';}
   </script>
 </body>
 </html>
