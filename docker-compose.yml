@@ -1,57 +1,78 @@
 version: '3.8'
 
 services:
-  # Auth Service Database
+  auth-service:
+    build:
+      context: ./services/auth-service
+      dockerfile: Dockerfile
+    ports:
+      - "3001:3001"
+    volumes:
+      - auth-data:/var/lib/postgresql/data
+    depends_on:
+      - auth-db
+
   auth-db:
-    image: postgres
-    restart: always
+    image: postgres:14
     environment:
-      POSTGRES_DB: auth_db
       POSTGRES_USER: auth_user
       POSTGRES_PASSWORD: auth_pass
+      POSTGRES_DB: auth_db
     volumes:
       - auth-data:/var/lib/postgresql/data
 
-  # Auth Service App
-  auth-service:
-    build: ./services/auth-service
+  user-service:
+    build:
+      context: ./services/user-service
+      dockerfile: Dockerfile
     ports:
-      - "3001:3001"
+      - "3002:3002"
+    volumes:
+      - user-data:/var/lib/postgresql/data
     depends_on:
-      - auth-db
-    environment:
-      - DB_HOST=auth-db
-      - DB_PORT=5432
-      - DB_NAME=auth_db
-      - DB_USER=auth_user
-      - DB_PASS=auth_pass
-      - JWT_SECRET=supersecretkey
+      - user-db
 
-  # User Service Database
   user-db:
-    image: postgres
-    restart: always
+    image: postgres:14
     environment:
-      POSTGRES_DB: user_db
       POSTGRES_USER: user_user
       POSTGRES_PASSWORD: user_pass
+      POSTGRES_DB: user_db
     volumes:
       - user-data:/var/lib/postgresql/data
 
-  # User Service App
-  user-service:
-    build: ./services/user-service
+  finance-service:
+    build:
+      context: ./services/finance-service
+      dockerfile: Dockerfile
     ports:
-      - "3002:3002"
+      - "3003:3003"
+    volumes:
+      - finance-data:/var/lib/postgresql/data
     depends_on:
-      - user-db
+      - finance-db
+
+  finance-db:
+    image: postgres:14
     environment:
-      - DB_HOST=user-db
-      - DB_PORT=5432
-      - DB_NAME=user_db
-      - DB_USER=user_user
-      - DB_PASS=user_pass
+      POSTGRES_USER: finance_user
+      POSTGRES_PASSWORD: finance_pass
+      POSTGRES_DB: finance_db
+    volumes:
+      - finance-data:/var/lib/postgresql/data
+
+  api-gateway:
+    build:
+      context: ./gateway
+      dockerfile: Dockerfile
+    ports:
+      - "8080:80"
+    depends_on:
+      - auth-service
+      - user-service
+      - finance-service
 
 volumes:
   auth-data:
   user-data:
+  finance-data:

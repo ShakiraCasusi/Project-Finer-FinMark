@@ -3,39 +3,108 @@
 <head>
   <meta charset="UTF-8" />
   <title>FinMark Login</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <link rel="stylesheet" href="style.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    body {
+      font-family: sans-serif;
+      background: #f5f7fb;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .login-container {
+      background: white;
+      padding: 2rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+      width: 100%;
+      max-width: 360px;
+    }
+    h2 {
+      text-align: center;
+      color: #3c78d8;
+    }
+    input {
+      width: 100%;
+      padding: 0.8rem;
+      margin: 0.6rem 0;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+    button {
+      width: 100%;
+      padding: 0.8rem;
+      background: #3c78d8;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      margin-top: 1rem;
+    }
+    button:hover {
+      background: #3366b8;
+    }
+    .error {
+      color: red;
+      text-align: center;
+      font-size: 0.9rem;
+      margin-top: 0.5rem;
+    }
+  </style>
 </head>
 <body>
   <div class="login-container">
-    <h1 class="logo">FinMark</h1>
-    <p class="sub">Login to your account</p>
-    
+    <h2>FinMark Login</h2>
     <form id="login-form">
-      <label>Email Address</label>
-      <input type="email" id="email" required placeholder="johndoe@email.com" />
-
-      <label>Password</label>
-      <input type="password" id="password" required placeholder="••••••••••" />
-
-      <div class="checkbox-row">
-        <input type="checkbox" id="keep" />
-        <label for="keep">Keep me signed in</label>
-      </div>
-
+      <input type="email" id="email" placeholder="Email" required />
+      <input type="password" id="password" placeholder="Password" required />
       <button type="submit">Login</button>
-
-      <div class="or">or sign in with</div>
-      <button type="button" class="google-btn">Continue with Google</button>
-
-      <p class="create-account">
-        <a href="#">Create an account</a>
-      </p>
-
-      <div id="result"></div>
+      <p class="error" id="error-msg"></p>
     </form>
   </div>
 
-  <script src="main.js"></script>
+  <script type="module">
+    document.getElementById('login-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      const errorEl = document.getElementById('error-msg');
+      errorEl.textContent = '';
+
+      try {
+        const res = await fetch('http://localhost:3001/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+          const token = data.token;
+          localStorage.setItem('token', token);
+          const payload = JSON.parse(atob(token.split('.')[1]));
+          const role = payload.role;
+
+          if (role === 'admin') {
+            window.location.href = 'admin-dashboard.html';
+          } else if (role === 'client') {
+            window.location.href = 'client-dashboard.html';
+          } else {
+            errorEl.textContent = 'Unknown user role.';
+          }
+
+        } else {
+          errorEl.textContent = data.error || 'Login failed.';
+        }
+
+      } catch (err) {
+        errorEl.textContent = 'Network error. Please try again.';
+      }
+    });
+  </script>
 </body>
 </html>

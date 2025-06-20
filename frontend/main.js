@@ -1,31 +1,31 @@
+// main.js – handles login + role-based redirect
+
+// Submit login form
 document.getElementById('login-form').addEventListener('submit', async (e) => {
   e.preventDefault();
+
   const email = document.getElementById('email').value;
   const password = document.getElementById('password').value;
-  const resultDiv = document.getElementById('result');
-  resultDiv.textContent = '';
 
   try {
-    const response = await fetch('http://localhost:3001/auth/login', {
+    const res = await fetch('http://localhost:3001/auth/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password })
     });
 
-    const data = await response.json();
+    const data = await res.json();
 
-    if (response.ok) {
-      localStorage.setItem('token', data.token);
-      resultDiv.textContent = '✅ Logged in successfully!';
-      setTimeout(() => {
-        window.location.href = 'dashboard.html';
-      }, 1200);
-    } else {
-      resultDiv.textContent = `❌ ${data.error}`;
-      resultDiv.style.color = 'red';
-    }
-  } catch (err) {
-    resultDiv.textContent = '❌ Network error';
-    resultDiv.style.color = 'red';
-  }
-});
+    if (res.ok) {
+      const token = data.token;
+      localStorage.setItem('token', token);
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      const role = payload.role;
+
+      // Route by role
+      if (role === 'admin') {
+        window.location.href = 'admin-dashboard.html';
+      } else if (role === 'client') {
+        window.location.href = 'client-dashboard.html';
+      } else {
+        alert('Unknown role. Access denied.');
