@@ -9,10 +9,11 @@ const register = async (req, res) => {
   try {
     await db.query(
       'INSERT INTO users (email, password, phone) VALUES ($1, $2, $3)',
-      [email, hashed, phone || null]
+      [email, hashed, phone]
     );
     res.status(201).json({ message: 'User registered successfully' });
   } catch (err) {
+    console.error('Register Error:', err); 
     res.status(500).json({ error: 'Registration failed', details: err.message });
   }
 };
@@ -25,21 +26,20 @@ const login = async (req, res) => {
     if (result.rows.length === 0)
       return res.status(401).json({ error: 'Invalid credentials' });
 
-    const user = result.rows[0];
-    const valid = await bcrypt.compare(password, user.password);
-    if (!valid)
-      return res.status(401).json({ error: 'Invalid credentials' });
+    const valid = await bcrypt.compare(password, result.rows[0].password);
+    if (!valid) return res.status(401).json({ error: 'Invalid credentials' });
 
     const token = jwt.sign(
-      { userId: user.id, role: user.role },
+      { userId: result.rows[0].id, role: result.rows[0].role },
       process.env.JWT_SECRET,
       { expiresIn: '1h' }
     );
-
     res.json({ token });
   } catch (err) {
+    console.error('Login Error:', err);
     res.status(500).json({ error: 'Login failed', details: err.message });
   }
 };
+
 
 module.exports = { register, login };
