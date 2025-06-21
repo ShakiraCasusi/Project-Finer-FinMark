@@ -1,11 +1,8 @@
-const { Pool } = require('pg');
-require('dotenv').config();
+const { Sequelize } = require('sequelize');
 
-const connectionString = process.env.DATABASE_URL;
-
-const pool = new Pool({
-  connectionString,
-  ssl: false, 
+const sequelize = new Sequelize('finmark', 'postgres', 'password', {
+  host: 'finer-db',       
+  dialect: 'postgres',
 });
 
-module.exports = pool;
+module.exports = sequelize;

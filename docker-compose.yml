@@ -1,78 +1,31 @@
-version: '3.8'
-
 services:
   auth-service:
-    build:
-      context: ./services/auth-service
-      dockerfile: Dockerfile
+    build: ./services/auth-service
+    container_name: finer-auth-service
     ports:
       - "3001:3001"
-    volumes:
-      - auth-data:/var/lib/postgresql/data
     depends_on:
-      - auth-db
-
-  auth-db:
-    image: postgres:14
+      - finer-db
     environment:
-      POSTGRES_USER: auth_user
-      POSTGRES_PASSWORD: auth_pass
-      POSTGRES_DB: auth_db
+      - SENDGRID_API_KEY=${SENDGRID_API_KEY}
+      - FROM_EMAIL=${FROM_EMAIL}
+      - PORT=3001
     volumes:
-      - auth-data:/var/lib/postgresql/data
+      - ./services/auth-service:/usr/src/app
+    working_dir: /usr/src/app
+    command: node server.js
 
-  user-service:
-    build:
-      context: ./services/user-service
-      dockerfile: Dockerfile
-    ports:
-      - "3002:3002"
-    volumes:
-      - user-data:/var/lib/postgresql/data
-    depends_on:
-      - user-db
-
-  user-db:
+  finer-db:
     image: postgres:14
+    container_name: finer-db
     environment:
-      POSTGRES_USER: user_user
-      POSTGRES_PASSWORD: user_pass
-      POSTGRES_DB: user_db
-    volumes:
-      - user-data:/var/lib/postgresql/data
-
-  finance-service:
-    build:
-      context: ./services/finance-service
-      dockerfile: Dockerfile
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: finmark
     ports:
-      - "3003:3003"
+      - "5432:5432"
     volumes:
-      - finance-data:/var/lib/postgresql/data
-    depends_on:
-      - finance-db
-
-  finance-db:
-    image: postgres:14
-    environment:
-      POSTGRES_USER: finance_user
-      POSTGRES_PASSWORD: finance_pass
-      POSTGRES_DB: finance_db
-    volumes:
-      - finance-data:/var/lib/postgresql/data
-
-  api-gateway:
-    build:
-      context: ./gateway
-      dockerfile: Dockerfile
-    ports:
-      - "8080:80"
-    depends_on:
-      - auth-service
-      - user-service
-      - finance-service
+      - pgdata:/var/lib/postgresql/data
 
 volumes:
-  auth-data:
-  user-data:
-  finance-data:
+  pgdata:
