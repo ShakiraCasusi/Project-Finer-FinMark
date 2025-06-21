@@ -15,7 +15,9 @@ app.use(express.json());
 
 // Routes
 const resetPasswordRoutes = require('./routes/resetPassword');
+const authLoginRoute = require('./routes/authLogin');
 app.use('/auth', resetPasswordRoutes);
+app.use('/auth', authLoginRoute);
 
 // Health check
 app.get('/', (req, res) => {
@@ -39,5 +41,5 @@ sequelize.authenticate()
     });
   })
   .catch((err) => {
-    console.error('❌ DB connection failed:', err);
+    console.error('DB connection failed:', err);
   });

@@ -15,7 +15,15 @@ const sendResetEmail = async (email, token) => {
     `,
   };
 
-  await sgMail.send(msg);
+  try {
+    await sgMail.send(msg);
+    console.log(`Email sent to ${email}`);
+  } catch (error) {
+    console.error('❌ SendGrid error:', error.response?.body || error.message);
+    
+    // NEW: Don't crash the server — instead fail gracefully
+    throw new Error('Email sending failed — check your API key or sender address.');
+  }
 };
 
 module.exports = sendResetEmail;
