@@ -1,0 +1,30 @@
+[
+    {
+        "id": 1,
+        "investmentName": "Tech Growth Fund",
+        "amount": 50000,
+        "currentValue": 65000,
+        "returnPercentage": 30
+    },
+    {
+        "id": 2,
+        "investmentName": "Real Estate Trust",
+        "amount": 100000,
+        "currentValue": 110000,
+        "returnPercentage": 10
+    },
+    {
+        "id": 3,
+        "investmentName": "S&P 500 Index Fund",
+        "amount": 75000,
+        "currentValue": 85000,
+        "returnPercentage": 13.3
+    },
+    {
+        "id": 4,
+        "investmentName": "Emerging Markets Bond",
+        "amount": 30000,
+        "currentValue": 32000,
+        "returnPercentage": 6.7
+    }
+] 
