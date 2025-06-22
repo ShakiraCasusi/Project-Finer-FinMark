@@ -1,0 +1,37 @@
+[
+    {
+        "id": 1,
+        "clientName": "John Doe",
+        "amount": 10000,
+        "interestRate": 5,
+        "status": "Active"
+    },
+    {
+        "id": 2,
+        "clientName": "Jane Smith",
+        "amount": 25000,
+        "interestRate": 4.5,
+        "status": "Active"
+    },
+    {
+        "id": 3,
+        "clientName": "Peter Jones",
+        "amount": 5000,
+        "interestRate": 6,
+        "status": "Paid Off"
+    },
+    {
+        "id": 4,
+        "clientName": "Mary Williams",
+        "amount": 150000,
+        "interestRate": 3.8,
+        "status": "Active"
+    },
+    {
+        "id": 5,
+        "clientName": "David Brown",
+        "amount": 75000,
+        "interestRate": 5.5,
+        "status": "Defaulted"
+    }
+] 
