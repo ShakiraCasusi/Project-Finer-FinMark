@@ -5,6 +5,7 @@
   --finmark-blue-dark: #042652;
 }
 
+/* Reset & base */
 * {
   margin: 0;
   padding: 0;
@@ -14,6 +15,7 @@
 
 .flex { display: flex; align-items: center; }
 
+/* Layout */
 .container {
   min-height: 100vh;
   padding: 0 15px;
@@ -27,19 +29,28 @@
   justify-content: space-between;
 }
 
-/* ✅ Logo section */
-.logo-section {
+.finmark-page .text {
   margin-bottom: 90px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  text-align: center;
 }
 
 .logo {
-  width: 160px;
+  width: 120px;
+  margin-bottom: 20px;
 }
 
-/* ✅ Login form */
+.finmark-page h1 {
+  color: var(--finmark-blue);
+  font-size: 3.8rem;
+  margin-bottom: 10px;
+}
+
+.finmark-page p {
+  font-size: 1.6rem;
+  line-height: 1.3;
+}
+
+/* Form */
 form {
   display: flex;
   flex-direction: column;
@@ -110,7 +121,7 @@ hr {
 
 .button a {
   display: inline-block;
-  background: #008a19;
+  background: #2dbc47;       /* keep the green accent */
   color: #fff;
   padding: 15px 20px;
   border-radius: 6px;
@@ -118,12 +129,16 @@ hr {
   transition: background 0.2s;
 }
 
-.button a:hover {
-  background: #007617;
-}
+.button a:hover { background: #28a13f; }
 
 /* Responsive tweaks */
 @media (max-width: 900px) {
-  .finmark-page {
-    flex-direction: column;
-    te
+  .finmark-page { flex-direction: column; text-align: center; }
+  .finmark-page .text { margin-bottom: 40px; }
+}
+
+@media (max-width: 460px) {
+  .finmark-page h1 { font-size: 3rem; }
+  .finmark-page p { font-size: 1.25rem; }
+  form { padding: 15px; }
+}
