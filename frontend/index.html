@@ -17,6 +17,7 @@
 
         <!-- Login form -->
         <form id="login-form" action="#">
+          <div id="login-error" class="error-message"></div>
           <input type="email" placeholder="Email" required />
           <input type="password" placeholder="Password" required />
 
@@ -41,6 +42,7 @@
         <h2 class="fb-title">Create a new account</h2>
         <p class="fb-subtitle">It's quick and easy.</p>
         <form id="register-form">
+          <div id="register-error" class="error-message"></div>
           <input type="email" placeholder="Email" required class="fb-input" />
           <input type="password" placeholder="Password" required class="fb-input" />
           <input type="password" placeholder="Confirm Password" required class="fb-input" />
@@ -48,6 +50,8 @@
         </form>
       </div>
     </div>
+
+    <div id="loading" class="loading-spinner" style="display:none;"></div>
 
     <script src="app.js"></script>
   </body>

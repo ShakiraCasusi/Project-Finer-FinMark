@@ -1,16 +1,35 @@
 document.getElementById('login-form').addEventListener('submit', async (e) => {
   e.preventDefault();
   const [email, password] = [...e.target.elements].map(el => el.value);
-
-  const res = await fetch('http://localhost:3000/api/login', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email, password })
-  });
-
-  const data = await res.json();
-  alert(data.message || 'Logged in!');
+  const errorDiv = document.getElementById('login-error');
+  errorDiv.textContent = '';
+  showLoading(true);
+  loginBtn.disabled = true;
+  try {
+    const res = await fetch('http://localhost:3000/api/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password })
+    });
+    const data = await res.json();
+    showLoading(false);
+    loginBtn.disabled = false;
+    if (data.success) {
+      alert(data.message || 'Logged in!');
+      e.target.reset();
+    } else {
+      errorDiv.textContent = data.message || 'Login failed!';
+    }
+  } catch {
+    showLoading(false);
+    loginBtn.disabled = false;
+    errorDiv.textContent = 'Server error. Please try again.';
+  }
 });
+
+function showLoading(show) {
+  document.getElementById('loading').style.display = show ? 'block' : 'none';
+}
 
 // Show/hide registration modal
 document.getElementById('show-register').onclick = function(e) {
@@ -26,27 +45,36 @@ window.onclick = function(event) {
   if (event.target === modal) modal.style.display = 'none';
 };
 
-// REGISTRATION FORM SUBMIT
+// REGISTRATION FORM SUBMIT with error display
 document.getElementById('register-form').addEventListener('submit', async function(e) {
   e.preventDefault();
   const [email, password, confirm] = [...e.target.elements].map(el => el.value);
+  const errorDiv = document.getElementById('register-error');
+  errorDiv.textContent = '';
   if (password !== confirm) {
-    alert('Passwords do not match!');
+    errorDiv.textContent = 'Passwords do not match!';
     return;
   }
-  const res = await fetch('http://localhost:3000/api/register', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email, password })
-  });
-  const data = await res.json();
-  alert(data.message || 'Registered!');
-  if (data.success) {
-    document.getElementById('register-modal').style.display = 'none';
+  try {
+    const res = await fetch('http://localhost:3000/api/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password })
+    });
+    const data = await res.json();
+    if (data.success) {
+      alert(data.message || 'Registered!');
+      document.getElementById('register-modal').style.display = 'none';
+      e.target.reset();
+    } else {
+      errorDiv.textContent = data.message || 'Registration failed!';
+    }
+  } catch {
+    errorDiv.textContent = 'Server error. Please try again.';
   }
 });
 
-// --- LOGIN BUTTON ENABLE ONLY IF FIELDS ARE FILLED ---
+// --- LOGIN BUTTON SHOW ONLY IF FIELDS ARE FILLED ---
 const loginForm = document.getElementById('login-form');
 const loginBtn = loginForm.querySelector('.login');
 loginForm.addEventListener('input', () => {
@@ -55,15 +83,11 @@ loginForm.addEventListener('input', () => {
     .every(el => el.value.trim() !== '');
   if (filled) {
     loginBtn.style.display = '';
-    loginBtn.disabled = false;
   } else {
     loginBtn.style.display = 'none';
-    loginBtn.disabled = true;
   }
 });
-// Initialize login button as hidden/disabled
-loginBtn.style.display = 'none';
-loginBtn.disabled = true;
+loginBtn.style.display = 'none'; // Hide by default
 
 // --- SIGN UP BUTTON ENABLE ONLY IF FIELDS ARE FILLED ---
 const regForm = document.getElementById('register-form');
@@ -81,3 +105,14 @@ regForm.addEventListener('input', () => {
   }
 });
 regBtn.disabled = true;
+
+// backend/server.js
+app.post('/api/login', async (req, res) => {
+  const { email, password } = req.body;
+  const users = readUsers();
+  const user = users.find(u => u.email === email);
+  if (user && await bcrypt.compare(password, user.password)) {
+    return res.json({ success: true, message: 'Login successful!' });
+  }
+  res.status(400).json({ success: false, message: 'Invalid credentials' });
+});
