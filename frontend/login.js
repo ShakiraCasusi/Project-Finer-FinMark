@@ -15,8 +15,7 @@ document.getElementById('login-form').addEventListener('submit', async (e) => {
     showLoading(false);
     loginBtn.disabled = false;
     if (data.success) {
-      alert(data.message || 'Logged in!');
-      e.target.reset();
+      window.location.href = "dashboard.html";
     } else {
       errorDiv.textContent = data.message || 'Login failed!';
     }

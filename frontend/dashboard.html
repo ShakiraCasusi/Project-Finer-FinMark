@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FinMark Dashboard</title>
+    <link rel="stylesheet" href="dashboard.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2>Dashboard</h2>
+            </div>
+            <nav class="sidebar-nav">
+                <ul>
+                    <li><a href="#" class="active">Overview</a></li>
+                    <li><a href="#">Loans</a></li>
+                    <li><a href="#">Investments</a></li>
+                    <li><a href="#">Clients</a></li>
+                    <li><a href="#">Reports</a></li>
+                </ul>
+            </nav>
+            <button class="logout-btn" onclick="window.location.href='login.html'">Logout</button>
+        </aside>
+        <main class="main-content">
+            <header class="header">
+                <div class="header-search">
+                    <input type="search" placeholder="Search...">
+                </div>
+                <div class="header-user">
+                    <span>Welcome, User</span>
+                </div>
+            </header>
+            <section class="content">
+                <h1>Dashboard Overview</h1>
+                <div class="widgets">
+                    <!-- Widgets will go here -->
+                </div>
+            </section>
+        </main>
+    </div>
+</body>
+</html>
