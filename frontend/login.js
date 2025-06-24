@@ -13,11 +13,48 @@ emailInput.addEventListener('input', checkInputs);
 passwordInput.addEventListener('input', checkInputs);
 checkInputs();
 
+// Ensure default state: password hidden, icon is eye-slash, and tooltip
+passwordInput.type = 'password';
+togglePassword.classList.remove('fa-eye');
+togglePassword.classList.add('fa-eye-slash');
+togglePassword.title = 'Show Password';
+
+// Always keep icon as eye-slash when typing (unless showing password)
+passwordInput.addEventListener('input', function () {
+  if (!passwordInput.value) {
+    passwordInput.type = 'password';
+    togglePassword.classList.remove('fa-eye');
+    togglePassword.classList.add('fa-eye-slash');
+    togglePassword.title = 'Show Password';
+  } else if (passwordInput.type === 'password') {
+    togglePassword.classList.remove('fa-eye');
+    togglePassword.classList.add('fa-eye-slash');
+    togglePassword.title = 'Show Password';
+  }
+});
+
 // Toggle password visibility
 togglePassword.addEventListener('click', function () {
-  const type = passwordInput.type === 'password' ? 'text' : 'password';
-  passwordInput.type = type;
-  this.innerHTML = type === 'password' ? '&#128065;' : '&#128584;';
+  if (passwordInput.type === 'password') {
+    passwordInput.type = 'text';
+    this.classList.remove('fa-eye-slash');
+    this.classList.add('fa-eye');
+    this.title = 'Hide Password';
+  } else {
+    passwordInput.type = 'password';
+    this.classList.remove('fa-eye');
+    this.classList.add('fa-eye-slash');
+    this.title = 'Show Password';
+  }
+});
+
+// Always reset icon to eye-slash if password field is cleared
+passwordInput.addEventListener('input', function () {
+  if (!passwordInput.value) {
+    passwordInput.type = 'password';
+    togglePassword.classList.remove('fa-eye');
+    togglePassword.classList.add('fa-eye-slash');
+  }
 });
 
 // Real Login Submit (connects to backend)
@@ -121,4 +158,80 @@ registerForm.addEventListener('submit', async (e) => {
 
 function showLoading(show) {
   document.getElementById('loading').style.display = show ? 'block' : 'none';
+}
+
+// --- REGISTER SECTION --
+
+// Add tooltip logic for register password and confirm password
+const regTogglePassword = registerForm.querySelector('.toggle-password[for="reg-password"]');
+const regToggleConfirm = registerForm.querySelector('.toggle-password[for="reg-confirm"]');
+const regPasswordInput = registerForm.querySelector('input[placeholder="Password"]');
+const regConfirmInput = registerForm.querySelector('input[placeholder="Confirm Password"]');
+
+if (regTogglePassword && regPasswordInput) {
+  regPasswordInput.type = 'password';
+  regTogglePassword.classList.remove('fa-eye');
+  regTogglePassword.classList.add('fa-eye-slash');
+  regTogglePassword.title = 'Show Password';
+
+  regPasswordInput.addEventListener('input', function () {
+    if (!regPasswordInput.value) {
+      regPasswordInput.type = 'password';
+      regTogglePassword.classList.remove('fa-eye');
+      regTogglePassword.classList.add('fa-eye-slash');
+      regTogglePassword.title = 'Show Password';
+    } else if (regPasswordInput.type === 'password') {
+      regTogglePassword.classList.remove('fa-eye');
+      regTogglePassword.classList.add('fa-eye-slash');
+      regTogglePassword.title = 'Show Password';
+    }
+  });
+
+  regTogglePassword.addEventListener('click', function () {
+    if (regPasswordInput.type === 'password') {
+      regPasswordInput.type = 'text';
+      this.classList.remove('fa-eye-slash');
+      this.classList.add('fa-eye');
+      this.title = 'Hide Password';
+    } else {
+      regPasswordInput.type = 'password';
+      this.classList.remove('fa-eye');
+      this.classList.add('fa-eye-slash');
+      this.title = 'Show Password';
+    }
+  });
+}
+
+if (regToggleConfirm && regConfirmInput) {
+  regConfirmInput.type = 'password';
+  regToggleConfirm.classList.remove('fa-eye');
+  regToggleConfirm.classList.add('fa-eye-slash');
+  regToggleConfirm.title = 'Show Password';
+
+  regConfirmInput.addEventListener('input', function () {
+    if (!regConfirmInput.value) {
+      regConfirmInput.type = 'password';
+      regToggleConfirm.classList.remove('fa-eye');
+      regToggleConfirm.classList.add('fa-eye-slash');
+      regToggleConfirm.title = 'Show Password';
+    } else if (regConfirmInput.type === 'password') {
+      regToggleConfirm.classList.remove('fa-eye');
+      regToggleConfirm.classList.add('fa-eye-slash');
+      regToggleConfirm.title = 'Show Password';
+    }
+  });
+
+  regToggleConfirm.addEventListener('click', function () {
+    if (regConfirmInput.type === 'password') {
+      regConfirmInput.type = 'text';
+      this.classList.remove('fa-eye-slash');
+      this.classList.add('fa-eye');
+      this.title = 'Hide Password';
+    } else {
+      regConfirmInput.type = 'password';
+      this.classList.remove('fa-eye');
+      this.classList.add('fa-eye-slash');
+      this.title = 'Show Password';
+    }
+  });
 }

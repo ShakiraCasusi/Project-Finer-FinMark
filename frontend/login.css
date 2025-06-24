@@ -162,6 +162,9 @@ form input::placeholder,
   display: flex;
   align-items: center;
 }
+.toggle-password.showing {
+  color: #2563eb;
+}
 
 /* Forgot password */
 .forgot-row {
