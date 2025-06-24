@@ -5,56 +5,111 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>FinMark Login</title>
     <link rel="stylesheet" href="login.css" />
+    <style>
+      /* Dark blue text when typing */
+      .typed-input {
+        color: #0a2259 !important;
+      }
+    </style>
   </head>
   <body>
-    <div class="container flex">
-      <div class="finmark-page flex">
-        <!-- Logo + marketing text -->
-        <div class="text">
-          <h1>FinMark</h1>
-          <p>Connect with your finances<br />and grow with FinMark.</p>
-        </div>
-
-        <!-- Login form -->
-        <form id="login-form" action="#">
-          <div id="login-error" class="error-message"></div>
-          <input type="email" placeholder="Email" required />
-          <input type="password" placeholder="Password" required />
-
-          <div class="link">
-            <button type="submit" class="login">Login</button>
-            <a href="#" class="forgot">Forgot password?</a>
-          </div>
-
-          <hr />
-
-          <div class="button">
-            <a href="#" id="show-register">Create new account</a>
-          </div>
-        </form>
+    <div class="login-bg">
+      <div class="login-left">
+        <h1><span style="color:#fff;">Welcome to</span> <span class="brand">FinMark</span></h1>
+        <p>Sign into your account and get immediate access to all of your financials.</p>
       </div>
-    </div>
-
-    <!-- Registration Modal -->
-    <div id="register-modal" class="modal" style="display:none;">
-      <div class="modal-content fb-modal">
-        <span id="close-register" class="close">&times;</span>
-        <h2 class="fb-title">Create a new account</h2>
-        <p class="fb-subtitle">It's quick and easy.</p>
-        <form id="register-form">
-          <div id="register-error" class="error-message"></div>
-          <input type="email" placeholder="Email" required class="fb-input" />
-          <input type="password" placeholder="Password" required class="fb-input" />
-          <input type="password" placeholder="Confirm Password" required class="fb-input" />
-          <button type="submit" class="fb-btn" disabled>Sign Up</button>
+      <div class="login-card">
+        <form id="login-form" class="modern-login" autocomplete="off">
+          <h2 class="login-title">Sign In</h2>
+          <div id="login-error" class="error-message"></div>
+          <label>Email Address</label>
+          <input type="email" required class="fb-input" id="email-input" placeholder="example@gmail.com" />
+          <label>Password</label>
+          <div class="password-row">
+            <input type="password" required class="fb-input" id="password-input" />
+          </div>
+          <div class="forgot-row">
+            <a href="#" class="forgot">Forgot Password?</a>
+          </div>
+          <button type="submit" class="login" disabled>Sign In</button>
         </form>
+        <button id="open-register" class="register-btn" type="button">Create Account</button>
       </div>
     </div>
 
     <div id="loading" class="loading-spinner" style="display:none;"></div>
-
-    <button class="logout-btn" onclick="window.location.href='login.html'">Logout</button>
-
     <script src="login.js"></script>
+    <script>
+document.addEventListener('DOMContentLoaded', function() {
+  const form = document.querySelector('form');
+  if (!form) return;
+
+  form.addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const email = form.querySelector('input[type="email"]').value;
+    const password = form.querySelector('input[type="password"]').value;
+
+    try {
+      const res = await fetch('http://localhost:3000/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      });
+      const data = await res.json();
+      if (data.success) {
+        // Redirect to dashboard on successful login
+        window.location.href = 'dashboard.html';
+      } else {
+        alert(data.message || 'Login failed');
+      }
+    } catch (err) {
+      alert('Error connecting to server');
+    }
+  });
+
+  document.getElementById('open-register').onclick = function() {
+    window.location.href = 'register.html';
+  };
+
+  // Add dark blue text color when typing
+  const emailInput = document.getElementById('email-input');
+  const passwordInput = document.getElementById('password-input');
+  [emailInput, passwordInput].forEach(input => {
+    input.addEventListener('input', function() {
+      if (input.value.length > 0) {
+        input.classList.add('typed-input');
+      } else {
+        input.classList.remove('typed-input');
+      }
+    });
+  });
+});
+</script>
+  </body>
+</html>
+  form.addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const email = form.querySelector('input[type="email"]').value;
+    const password = form.querySelector('input[type="password"]').value;
+
+    try {
+      const res = await fetch('http://localhost:3000/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      });
+      const data = await res.json();
+      if (data.success) {
+        // Redirect to dashboard on successful login
+        window.location.href = 'dashboard.html';
+      } else {
+        alert(data.message || 'Login failed');
+      }
+    } catch (err) {
+      alert('Error connecting to server');
+    }
+  });
+});
+</script>
   </body>
 </html>
