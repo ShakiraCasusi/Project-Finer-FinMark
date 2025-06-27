@@ -8,7 +8,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Connect to MongoDB
+// MongoDB connection
 mongoose.connect('mongodb://localhost:27017/finer-finmark', {
   useNewUrlParser: true,
   useUnifiedTopology: true
@@ -18,37 +18,62 @@ mongoose.connect('mongodb://localhost:27017/finer-finmark', {
   console.error('MongoDB connection error:', err);
 });
 
-// Register endpoint
+// Register route
 app.post('/api/register', async (req, res) => {
   try {
-    const existingUser = await User.findOne({ email: req.body.email });
-    if (existingUser) return res.status(400).json({ success: false, message: 'Email already exists' });
+    const {
+      firstName, lastName, email, password,
+      company = '', revenue = '', role = '',
+      location = '', employees = ''
+    } = req.body;
 
-    const newUser = new User(req.body);
+    if (!firstName || !lastName || !email || !password) {
+      return res.status(400).json({ success: false, message: 'Required fields missing.' });
+    }
+
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(400).json({ success: false, message: 'Email already exists' });
+    }
+
+    const newUser = new User({
+      firstName, lastName, email, password,
+      company, revenue, role, location, employees
+    });
+
     await newUser.save();
 
-    res.json({ success: true });
-  } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    res.json({ success: true, message: 'User registered successfully' });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
   }
 });
 
-// Login endpoint
+// Login route
 app.post('/api/login', async (req, res) => {
   const { email, password } = req.body;
-  const user = await User.findOne({ email, password });
+  console.log(`Login attempt: ${email}, ${password}`);
 
-  if (!user) return res.status(401).json({ success: false, message: 'Invalid credentials' });
+  try {
+    const user = await User.findOne({ email, password });
 
-  // Exclude password from response
-  const { password: _, ...userData } = user.toObject();
+    if (!user) {
+      console.log('Login failed: invalid credentials');
+      return res.status(401).json({ success: false, message: 'Invalid credentials' });
+    }
 
-  res.json({ success: true, user: userData, message: 'Login successful' });
+    console.log('Login successful');
+    const { password: _, ...userData } = user.toObject();
+    res.json({ success: true, user: userData, message: 'Login successful' });
+  } catch (err) {
+    res.status(500).json({ success: false, message: 'Server error during login' });
+  }
 });
 
-// Export app for testing
+// Export for tests
 module.exports = app;
 
+// Run server
 if (require.main === module) {
   const PORT = 3000;
   app.listen(PORT, () => {

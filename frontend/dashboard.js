@@ -164,3 +164,57 @@ function displayInvestmentsTable(investments) {
     `;
     pageContent.appendChild(table);
 }
+
+// Sidebar toggle logic
+
+const sidebar = document.getElementById('sidebar');
+const sidebarToggle = document.getElementById('sidebarToggle');
+const logoutBtn = document.getElementById('logoutBtn');
+const sidebarHeader = document.getElementById('sidebarHeader');
+const sidebarLogoIcon = document.getElementById('sidebarLogoIcon');
+const brand = document.querySelector('.brand');
+
+function updateSidebarUI() {
+    if (sidebar.classList.contains('minimized')) {
+        // Hide the label for logout, show only icon
+        logoutBtn.querySelector('.sidebar-label').style.display = 'none';
+        logoutBtn.style.justifyContent = 'center';
+        logoutBtn.style.margin = '16px auto 0 auto';
+        sidebarHeader.style.justifyContent = 'center';
+        sidebarHeader.style.alignItems = 'center';
+        sidebarLogoIcon.style.margin = '0 auto';
+        sidebarLogoIcon.style.display = 'flex';
+        if (brand) brand.style.display = 'none';
+    } else {
+        logoutBtn.querySelector('.sidebar-label').style.display = '';
+        logoutBtn.style.justifyContent = '';
+        logoutBtn.style.margin = '0 0 0 32px';
+        sidebarHeader.style.justifyContent = '';
+        sidebarHeader.style.alignItems = 'center';
+        sidebarLogoIcon.style.margin = '';
+        sidebarLogoIcon.style.display = 'flex';
+        if (brand) brand.style.display = '';
+    }
+}
+
+sidebarToggle.addEventListener('click', () => {
+    sidebar.classList.toggle('minimized');
+    updateSidebarUI();
+});
+
+window.addEventListener('DOMContentLoaded', () => {
+    if (window.innerWidth < 900) {
+        sidebar.classList.add('minimized');
+    }
+    updateSidebarUI();
+});
+
+// Highlight role badge on click
+document.querySelectorAll('.role-badge.clickable').forEach(function (badge) {
+    badge.addEventListener('click', function () {
+        document.querySelectorAll('.role-badge.clickable').forEach(function (b) {
+            b.classList.remove('active');
+        });
+        badge.classList.add('active');
+    });
+});

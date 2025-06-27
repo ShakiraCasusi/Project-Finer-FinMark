@@ -39,51 +39,50 @@
 
     <div id="loading" class="loading-spinner" style="display:none;"></div>
     <script src="login.js"></script>
+
     <script>
-document.addEventListener('DOMContentLoaded', function() {
-  const form = document.querySelector('form');
-  if (!form) return;
+      document.addEventListener('DOMContentLoaded', function() {
+        const form = document.querySelector('form');
+        if (!form) return;
 
-  form.addEventListener('submit', async function(e) {
-    e.preventDefault();
-    const email = form.querySelector('input[type="email"]').value;
-    const password = form.querySelector('input[type="password"]').value;
+        form.addEventListener('submit', async function(e) {
+          e.preventDefault();
+          const email = form.querySelector('input[type="email"]').value;
+          const password = form.querySelector('input[type="password"]').value;
 
-    try {
-      const res = await fetch('http://localhost:3000/api/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password })
+          try {
+            const res = await fetch('http://127.0.0.1:3000/api/login', { 
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ email, password })
+            });
+            const data = await res.json();
+            if (data.success) {
+              window.location.href = 'dashboard.html';
+            } else {
+              alert(data.message || 'Login failed');
+            }
+          } catch (err) {
+            alert('Error connecting to server.');
+          }
+        });
+
+        document.getElementById('open-register').onclick = function() {
+          window.location.href = 'register.html';
+        };
+
+        const emailInput = document.getElementById('email-input');
+        const passwordInput = document.getElementById('password-input');
+        [emailInput, passwordInput].forEach(input => {
+          input.addEventListener('input', function() {
+            if (input.value.length > 0) {
+              input.classList.add('typed-input');
+            } else {
+              input.classList.remove('typed-input');
+            }
+          });
+        });
       });
-      const data = await res.json();
-      if (data.success) {
-        // Redirect to dashboard on successful login
-        window.location.href = 'dashboard.html';
-      } else {
-        alert(data.message || 'Login failed');
-      }
-    } catch (err) {
-      alert('Error connecting to server');
-    }
-  });
-
-  document.getElementById('open-register').onclick = function() {
-    window.location.href = 'register.html';
-  };
-
-  // Add dark blue text color when typing
-  const emailInput = document.getElementById('email-input');
-  const passwordInput = document.getElementById('password-input');
-  [emailInput, passwordInput].forEach(input => {
-    input.addEventListener('input', function() {
-      if (input.value.length > 0) {
-        input.classList.add('typed-input');
-      } else {
-        input.classList.remove('typed-input');
-      }
-    });
-  });
-});
-</script>
+    </script>
   </body>
 </html>
