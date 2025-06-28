@@ -247,82 +247,158 @@
 </style>
 
 <script>
-    // Sidebar toggle logic
-
-    const sidebar = document.getElementById('sidebar');
-    const sidebarToggle = document.getElementById('sidebarToggle');
-    const logoutBtn = document.getElementById('logoutBtn');
-    const sidebarHeader = document.getElementById('sidebarHeader');
-    const sidebarLogoIcon = document.getElementById('sidebarLogoIcon');
-    const brand = document.querySelector('.brand');
-
-    function updateSidebarUI() {
-        if (sidebar.classList.contains('minimized')) {
-            // Hide the label for logout, show only icon
-            logoutBtn.querySelector('.sidebar-label').style.display = 'none';
-            logoutBtn.style.justifyContent = 'center';
-            logoutBtn.style.margin = '16px auto 0 auto';
-            sidebarHeader.style.justifyContent = 'center';
-            sidebarHeader.style.alignItems = 'center';
-            sidebarLogoIcon.style.margin = '0 auto';
-            sidebarLogoIcon.style.display = 'flex';
-            if (brand) brand.style.display = 'none';
-        } else {
-            logoutBtn.querySelector('.sidebar-label').style.display = '';
-            logoutBtn.style.justifyContent = '';
-            logoutBtn.style.margin = '0 0 0 32px';
-            sidebarHeader.style.justifyContent = '';
-            sidebarHeader.style.alignItems = 'center';
-            sidebarLogoIcon.style.margin = '';
-            sidebarLogoIcon.style.display = 'flex';
-            if (brand) brand.style.display = '';
+    // ==================== COMPREHENSIVE SIDEBAR MANAGEMENT ====================
+    
+    // Apply sidebar state immediately to prevent movement
+    (function() {
+        const sidebar = document.getElementById('sidebar');
+        if (sidebar) {
+            // Temporarily disable transitions
+            sidebar.style.transition = 'none';
+            
+            // Apply saved state immediately
+            const savedState = localStorage.getItem('sidebarMinimized');
+            if (savedState === 'true') {
+                sidebar.classList.add('minimized');
+            } else {
+                sidebar.classList.remove('minimized');
+            }
+            
+            // Re-enable transitions after a short delay
+            setTimeout(() => {
+                sidebar.style.transition = '';
+            }, 100);
         }
+    })();
+    
+    // Wait for DOM to be fully loaded
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize sidebar functionality
+        initializeSidebar();
+        
+        // Initialize other functionality
+        initializeRoleBadges();
+        initializeActiveLinks();
+        initializeLogout();
+    });
+
+    function initializeSidebar() {
+        const sidebar = document.getElementById('sidebar');
+        const sidebarToggle = document.getElementById('sidebarToggle');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const sidebarHeader = document.getElementById('sidebarHeader');
+        const sidebarLogoIcon = document.getElementById('sidebarLogoIcon');
+        const brand = document.querySelector('.brand');
+
+        // Function to update sidebar UI based on state
+        function updateSidebarUI() {
+            if (sidebar.classList.contains('minimized')) {
+                // Minimized state
+                logoutBtn.querySelector('.sidebar-label').style.display = 'none';
+                logoutBtn.style.justifyContent = 'center';
+                logoutBtn.style.margin = '16px auto 0 auto';
+                sidebarHeader.style.justifyContent = 'center';
+                sidebarHeader.style.alignItems = 'center';
+                sidebarLogoIcon.style.margin = '0 auto';
+                sidebarLogoIcon.style.display = 'flex';
+                if (brand) brand.style.display = 'none';
+            } else {
+                // Expanded state
+                logoutBtn.querySelector('.sidebar-label').style.display = '';
+                logoutBtn.style.justifyContent = '';
+                logoutBtn.style.margin = '0 0 0 32px';
+                sidebarHeader.style.justifyContent = '';
+                sidebarHeader.style.alignItems = 'center';
+                sidebarLogoIcon.style.margin = '';
+                sidebarLogoIcon.style.display = 'flex';
+                if (brand) brand.style.display = '';
+            }
+        }
+
+        // Function to save sidebar state
+        function saveSidebarState() {
+            const isMinimized = sidebar.classList.contains('minimized');
+            localStorage.setItem('sidebarMinimized', isMinimized.toString());
+        }
+
+        // Function to load sidebar state
+        function loadSidebarState() {
+            const savedState = localStorage.getItem('sidebarMinimized');
+            if (savedState === 'true') {
+                sidebar.classList.add('minimized');
+            } else {
+                sidebar.classList.remove('minimized');
+            }
+            updateSidebarUI();
+        }
+
+        // Only allow sidebar toggle via hamburger button
+        sidebarToggle.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            sidebar.classList.toggle('minimized');
+            saveSidebarState();
+            updateSidebarUI();
+        });
+
+        // Prevent sidebar from expanding when clicking navigation links
+        const navLinks = document.querySelectorAll('.sidebar-nav a');
+        navLinks.forEach(function(link) {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                // Get the href and navigate manually
+                const href = link.getAttribute('href');
+                if (href) {
+                    // Navigate to the page while preserving sidebar state
+                    window.location.href = href;
+                }
+            });
+        });
+
+        // Load saved state on page load
+        loadSidebarState();
     }
 
-    sidebarToggle.addEventListener('click', () => {
-        sidebar.classList.toggle('minimized');
-        updateSidebarUI();
-    });
-
-    window.addEventListener('DOMContentLoaded', () => {
-        if (window.innerWidth < 900) {
-            sidebar.classList.add('minimized');
-        }
-        updateSidebarUI();
-    });
-
-    // Highlight role badge on click
-    document.querySelectorAll('.role-badge.clickable').forEach(function (badge) {
-        badge.addEventListener('click', function () {
-            document.querySelectorAll('.role-badge.clickable').forEach(function (b) {
-                b.classList.remove('active');
+    function initializeRoleBadges() {
+        // Highlight role badge on click
+        document.querySelectorAll('.role-badge.clickable').forEach(function(badge) {
+            badge.addEventListener('click', function() {
+                document.querySelectorAll('.role-badge.clickable').forEach(function(b) {
+                    b.classList.remove('active');
+                });
+                badge.classList.add('active');
             });
-            badge.classList.add('active');
         });
-    });
+    }
 
-      document.addEventListener('DOMContentLoaded', () => {
-    const links = document.querySelectorAll('.sidebar-nav a');
-    const currentPage = window.location.pathname.split('/').pop(); // e.g., "statistics.html"
+    function initializeActiveLinks() {
+        // Set active link based on current page
+        const links = document.querySelectorAll('.sidebar-nav a');
+        const currentPage = window.location.pathname.split('/').pop() || 'notifications.html';
 
-    links.forEach(link => {
-      const linkPage = link.getAttribute('href');
-      if (linkPage === currentPage) {
-        link.classList.add('active'); // 🔹 This triggers the blue style!
-      } else {
-        link.classList.remove('active');
-      }
-    });
-  });
+        links.forEach(function(link) {
+            const linkPage = link.getAttribute('href');
+            if (linkPage === currentPage) {
+                link.classList.add('active');
+            } else {
+                link.classList.remove('active');
+            }
+        });
+    }
 
-    // Logout functionality
-    document.getElementById('logoutBtn').addEventListener('click', function () {
-        // Clear session or local storage (if used for login/session)
-        localStorage.clear();
-        sessionStorage.clear();
+    function initializeLogout() {
+        // Logout functionality
+        document.getElementById('logoutBtn').addEventListener('click', function() {
+            // Clear session or local storage (if used for login/session)
+            localStorage.clear();
+            sessionStorage.clear();
 
-        // Redirect to login.html
-        window.location.href = 'login.html';
-    });
+            // Redirect to login.html
+            window.location.href = 'login.html';
+        });
+    }
 </script>
 
