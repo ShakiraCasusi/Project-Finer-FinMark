@@ -300,5 +300,15 @@
             badge.classList.add('active');
         });
     });
+
+    // Logout functionality
+    document.getElementById('logoutBtn').addEventListener('click', function () {
+        // Clear session or local storage (if used for login/session)
+        localStorage.clear();
+        sessionStorage.clear();
+
+        // Redirect to login.html
+        window.location.href = 'login.html';
+    });
 </script>
 
