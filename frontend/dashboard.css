@@ -542,6 +542,20 @@ body {
     display: block;
     font-weight: 600;
     text-align: center;
+    cursor: text;
+    transition: border-color 0.3s ease, background-color 0.3s ease;
+}
+
+.amount-input:focus {
+    outline: none;
+    border-color: #0177FB;
+    background-color: #fff;
+    box-shadow: 0 0 0 3px rgba(1, 119, 251, 0.1);
+}
+
+.amount-input::placeholder {
+    color: #999;
+    opacity: 0.7;
 }
 
 /* ----------------------------------- */

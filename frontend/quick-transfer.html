@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quick Transfer - FinMark</title>
+    <link rel="stylesheet" href="quick-transfer.css">
+</head>
+<body>
+    <div class="transfer-container">
+        <a href="dashboard.html" class="back-link">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                <path d="M19 12H5M12 19L5 12L12 5" stroke="#0177FB" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            Back to Dashboard
+        </a>
+        
+        <div class="transfer-header">
+            <h1>Quick Transfer</h1>
+            <p>Complete your money transfer securely</p>
+        </div>
+        
+        <div class="amount-display">
+            <div class="label">Transfer Amount</div>
+            <div class="amount" id="transferAmount">₱0.00</div>
+        </div>
+        
+        <form class="transfer-form" id="transferForm">
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="recipientName">Recipient Name</label>
+                    <input type="text" id="recipientName" placeholder="Enter recipient's full name" required>
+                </div>
+                <div class="form-group">
+                    <label for="recipientEmail">Recipient Email</label>
+                    <input type="email" id="recipientEmail" placeholder="recipient@email.com" required>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="bankAccount">Bank Account Number</label>
+                <input type="text" id="bankAccount" placeholder="Enter account number" required>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="bankName">Bank Name</label>
+                    <select id="bankName" required>
+                        <option value="">Select Bank</option>
+                        <option value="bdo">BDO Unibank</option>
+                        <option value="bpi">BPI</option>
+                        <option value="metrobank">Metrobank</option>
+                        <option value="unionbank">UnionBank</option>
+                        <option value="landbank">LandBank</option>
+                        <option value="rcbc">RCBC</option>
+                        <option value="chinabank">China Bank</option>
+                        <option value="securitybank">Security Bank</option>
+                        <option value="eastwest">EastWest Bank</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="transferType">Transfer Type</label>
+                    <select id="transferType" required>
+                        <option value="">Select Type</option>
+                        <option value="instant">Instant Transfer</option>
+                        <option value="standard">Standard Transfer</option>
+                        <option value="scheduled">Scheduled Transfer</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="message">Message (Optional)</label>
+                <input type="text" id="message" placeholder="Add a personal message">
+            </div>
+            
+            <div class="transfer-actions">
+                <button type="button" class="btn btn-secondary" onclick="window.location.href='dashboard.html'">Cancel</button>
+                <button type="submit" class="btn btn-primary">Confirm Transfer</button>
+            </div>
+        </form>
+        
+        <div class="security-note">
+            <strong>🔒 Secure Transfer:</strong> Your transaction is protected by bank-level security encryption.
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Display the transfer amount from session storage
+            const transferAmount = sessionStorage.getItem('transferAmount');
+            if (transferAmount) {
+                const formattedAmount = parseFloat(transferAmount).toLocaleString('en-US', {
+                    style: 'currency',
+                    currency: 'PHP',
+                    minimumFractionDigits: 2
+                });
+                document.getElementById('transferAmount').textContent = formattedAmount;
+            }
+            
+            // Handle form submission
+            document.getElementById('transferForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const recipientName = document.getElementById('recipientName').value;
+                const recipientEmail = document.getElementById('recipientEmail').value;
+                const bankAccount = document.getElementById('bankAccount').value;
+                const bankName = document.getElementById('bankName').value;
+                const transferType = document.getElementById('transferType').value;
+                const message = document.getElementById('message').value;
+                
+                // Validate email format
+                const emailRegex = /^[^\s@]+@(gmail\.com|mail\.com)$/i;
+                if (!emailRegex.test(recipientEmail)) {
+                    alert('Please enter a valid email address (@gmail.com or @mail.com)');
+                    return;
+                }
+                
+                // Show success message
+                alert(`Transfer of ${document.getElementById('transferAmount').textContent} to ${recipientName} has been initiated successfully!`);
+                
+                // Clear session storage and redirect to dashboard
+                sessionStorage.removeItem('transferAmount');
+                window.location.href = 'dashboard.html';
+            });
+            
+            // Email validation on input
+            document.getElementById('recipientEmail').addEventListener('blur', function() {
+                const email = this.value;
+                const emailRegex = /^[^\s@]+@(gmail\.com|mail\.com)$/i;
+                
+                if (email && !emailRegex.test(email)) {
+                    this.style.borderColor = '#e53935';
+                    this.style.backgroundColor = '#ffeaea';
+                } else {
+                    this.style.borderColor = '#e1e5e9';
+                    this.style.backgroundColor = '#fff';
+                }
+            });
+        });
+    </script>
+</body>
+</html> 

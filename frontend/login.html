@@ -10,6 +10,17 @@
       .typed-input {
         color: #0a2259 !important;
       }
+      .input-error {
+        border: 2px solid #e53935 !important;
+        background-color: #ffeaea !important;
+      }
+      .error-message {
+        color: #e53935;
+        font-size: 14px;
+        margin-bottom: 10px;
+        text-align: center;
+        min-height: 20px;
+      }
     </style>
   </head>
   <body>
@@ -45,10 +56,28 @@
         const form = document.querySelector('form');
         if (!form) return;
 
+        // Email validation function
+        function validateEmail(email) {
+          const emailRegex = /^[^\s@]+@(gmail\.com|mail\.com)$/i;
+          return emailRegex.test(email);
+        }
+
         form.addEventListener('submit', async function(e) {
           e.preventDefault();
           const email = form.querySelector('input[type="email"]').value;
           const password = form.querySelector('input[type="password"]').value;
+          const errorDiv = document.getElementById('login-error');
+
+          // Clear previous errors
+          errorDiv.textContent = '';
+          form.querySelector('input[type="email"]').classList.remove('input-error');
+
+          // Validate email format
+          if (!validateEmail(email)) {
+            errorDiv.textContent = 'Please enter a valid email address (@gmail.com or @mail.com)';
+            form.querySelector('input[type="email"]').classList.add('input-error');
+            return;
+          }
 
           try {
             const res = await fetch('http://127.0.0.1:3000/api/login', { 
@@ -60,10 +89,10 @@
             if (data.success) {
               window.location.href = 'dashboard.html';
             } else {
-              alert(data.message || 'Login failed');
+              errorDiv.textContent = data.message || 'Login failed';
             }
           } catch (err) {
-            alert('Error connecting to server.');
+            errorDiv.textContent = 'Error connecting to server.';
           }
         });
 
@@ -79,6 +108,11 @@
               input.classList.add('typed-input');
             } else {
               input.classList.remove('typed-input');
+            }
+            // Clear error when user starts typing
+            if (input.type === 'email') {
+              input.classList.remove('input-error');
+              document.getElementById('login-error').textContent = '';
             }
           });
         });

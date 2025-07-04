@@ -113,6 +113,12 @@
         });
       });
 
+      // Email validation function
+      function validateEmail(email) {
+        const emailRegex = /^[^\s@]+@(gmail\.com|mail\.com)$/i;
+        return emailRegex.test(email);
+      }
+
       document.getElementById('register-form').addEventListener('submit', async function(e) {
         e.preventDefault();
         const errorDiv = document.getElementById('register-error');
@@ -133,6 +139,13 @@
         [firstNameInput, lastNameInput, emailInput, passwordInput, confirmPasswordInput].forEach(input => {
           input.classList.remove('input-error');
         });
+
+        // Validate email format
+        if (!validateEmail(email)) {
+          errorDiv.textContent = 'Please enter a valid email address (@gmail.com or @mail.com)';
+          emailInput.classList.add('input-error');
+          return;
+        }
 
         if (password !== confirmPassword) {
           errorDiv.textContent = "Passwords do not match.";

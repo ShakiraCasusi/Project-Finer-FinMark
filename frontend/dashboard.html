@@ -305,8 +305,8 @@
                             <span>VISA</span>
                             <span>**** 5478</span>
                         </div>
-                        <input type="number" class="amount-input" value="1450.60" placeholder="&#8369;0.00">
-                        <button class="send-money-btn">Send Money</button>
+                        <input type="text" class="amount-input" value="1450.60" placeholder="&#8369;0.00" maxlength="15">
+                        <button class="send-money-btn" id="sendMoneyBtn">Send Money</button>
                     </div>
                 </div>
             </section>
@@ -345,6 +345,115 @@
         <!-- End Main Content -->
 
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const amountInput = document.querySelector('.amount-input');
+            const sendMoneyBtn = document.getElementById('sendMoneyBtn');
+
+            // Store cursor position for better UX
+            let cursorPosition = 0;
+
+            // Format amount input to handle currency formatting
+            amountInput.addEventListener('input', function(e) {
+                const start = e.target.selectionStart;
+                const end = e.target.selectionEnd;
+                
+                // Get the raw value without formatting
+                let value = e.target.value.replace(/[^\d.]/g, '');
+                
+                // Handle backspace and deletion
+                if (e.inputType === 'deleteContentBackward' || e.inputType === 'deleteContentForward') {
+                    // Allow deletion by not reformatting immediately
+                    return;
+                }
+                
+                // Remove multiple dots
+                const dots = value.match(/\./g);
+                if (dots && dots.length > 1) {
+                    value = value.replace(/\.+$/, '');
+                }
+                
+                // Limit to 1 billion
+                const numValue = parseFloat(value) || 0;
+                if (numValue > 1000000000) {
+                    value = '1000000000';
+                }
+                
+                // Format with commas and 2 decimal places
+                if (value && value !== '0') {
+                    const formatted = parseFloat(value).toLocaleString('en-US', {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                    });
+                    e.target.value = formatted;
+                    
+                    // Restore cursor position after formatting
+                    setTimeout(() => {
+                        const newPosition = Math.min(start, formatted.length);
+                        e.target.setSelectionRange(newPosition, newPosition);
+                    }, 0);
+                } else {
+                    e.target.value = value;
+                }
+            });
+
+            // Handle keydown for better deletion experience
+            amountInput.addEventListener('keydown', function(e) {
+                // Allow backspace, delete, arrow keys, tab, etc.
+                if ([8, 9, 37, 38, 39, 40, 46].includes(e.keyCode)) {
+                    return;
+                }
+                
+                // Allow numbers and decimal point
+                if ((e.keyCode >= 48 && e.keyCode <= 57) || e.keyCode === 190) {
+                    return;
+                }
+                
+                // Allow numpad numbers
+                if (e.keyCode >= 96 && e.keyCode <= 105) {
+                    return;
+                }
+                
+                // Prevent other keys
+                e.preventDefault();
+            });
+
+            // Handle focus to select all text for easy replacement
+            amountInput.addEventListener('focus', function(e) {
+                if (e.target.value === '1450.60') {
+                    e.target.select();
+                }
+            });
+
+            // Handle Send Money button click
+            sendMoneyBtn.addEventListener('click', function() {
+                const amount = amountInput.value.replace(/[^\d.]/g, '');
+                if (!amount || parseFloat(amount) <= 0) {
+                    alert('Please enter a valid amount');
+                    return;
+                }
+                
+                // Validate 1 billion limit
+                const numAmount = parseFloat(amount);
+                if (numAmount > 1000000000) {
+                    alert('Amount cannot exceed ₱1,000,000,000.00');
+                    return;
+                }
+                
+                // Store amount in session storage for the transfer page
+                sessionStorage.setItem('transferAmount', amount);
+                window.location.href = 'quick-transfer.html';
+            });
+
+            // Clear default value on first click
+            amountInput.addEventListener('click', function(e) {
+                if (e.target.value === '1450.60') {
+                    e.target.value = '';
+                }
+            });
+        });
+    </script>
 </body>
 
 </html>
